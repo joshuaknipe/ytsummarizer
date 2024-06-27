@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube Video Summary!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Paste a YouTube Link</h1>
+        <input type="text" id="videoUrl" placeholder="YouTube Video URL">
+
+        <div class="buttons-container">
+            <button onclick="summarize()">Summarize</button>
+            <button onclick="copyToClipboard()">Copy</button>
+        </div>
+        <p id="summary"></p>
+
+    </div>
+
+    <script>
+        function summarize() {
+            const spinner = document.getElementById('spinner');
+            const videoUrl = document.getElementById('videoUrl').value;
+            
+            const videoId = extractVideoID(videoUrl);
+
+            let iframe = document.getElementById('youtubeIframe');
+
+            if (iframe) {
+                // If the iframe exists, just update its src attribute to the new video
+                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+            } else {
+                // If the iframe does not exist, create it
+                iframe = document.createElement('iframe');
+                iframe.setAttribute('id', 'youtubeIframe'); // Assign an ID for future reference
+                iframe.setAttribute('width', '560');
+                iframe.setAttribute('height', '315');
+                iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', true);
+                iframe.style.marginTop = '20px'; // Add a top margin to create a gap
+
+                // Insert the iframe into the page
+                const summaryElement = document.getElementById('summary');
+                summaryElement.parentNode.insertBefore(iframe, summaryElement);
+            }
+
+
+            console.log('Sending request for URL:', videoUrl); // Debug log
+
+            spinner.style.display = 'flex';
+            fetch('/summarize', {
+            //fetch('http://192.168.1.200:8442/proxy/5000/summarize', {    
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({video_url: videoUrl}),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data); // Debug log
+                // Use marked to convert Markdown in the summary to HTML
+                const summaryHtml = marked.parse(data.summary || 'Error: ' + data.error);
+                // Set innerHTML instead of innerText to render the HTML content
+                document.getElementById('summary').innerHTML = summaryHtml;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('summary').innerText = 'Failed to fetch summary: ' + error.message;
+            })
+            .finally(() => {
+                // Hide spinner
+                spinner.style.display = 'none';
+            });
+        }
+
+        function copyToClipboard() {
+            const summaryText = document.getElementById('summary').innerText;
+            const el = document.createElement('textarea'); // Create a <textarea> element
+            el.value = summaryText; // Set its value to the text that you want copied
+            el.setAttribute('readonly', ''); // Make it readonly to be tamper-proof
+            el.style.position = 'absolute'; 
+            el.style.left = '-9999px'; // Move outside the screen to make it invisible
+            document.body.appendChild(el); // Append the <textarea> element to the HTML document
+            const selected = 
+                document.getSelection().rangeCount > 0 // Check if there is any content selected previously
+                ? document.getSelection().getRangeAt(0) // Store selection if found
+                : false; // Mark as false to know no selection existed before
+            el.select(); // Select the <textarea> content
+            document.execCommand('copy'); // Copy - only works as a result of a user action (e.g., click events)
+            document.body.removeChild(el); // Remove the <textarea> element
+            if (selected) { // If a selection existed before copying
+                document.getSelection().removeAllRanges(); // Unselect everything on the HTML document
+                document.getSelection().addRange(selected); // Restore the original selection
+            }
+        }
+
+        function extractVideoID(url) {
+            const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+
+            if (match && match[2].length == 11) {
+                return match[2];
+            } else {
+                // Handle error or invalid URL
+                console.error('Invalid YouTube URL');
+                return null;
+            }
+        }   
+    </script>
+
+    <div id="spinner" class="spinner-container">
+        <div class="spinner"></div>
+    </div>
+</body>
+</html>
