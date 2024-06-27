@@ -1,17 +1,12 @@
-html {
-    height: 100%;
-    overflow-y: auto;
-}
-
 body {
-    min-height: 100%;
-    margin: 0;
     font-family: 'Arial', sans-serif;
     background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding-top: 20px;
+    align-items: center;
+    height: 100vh;
 }
 
 h1 {
@@ -50,9 +45,11 @@ p#summary {
     background-color: #fff;
     border-radius: 5px;
     padding: 10px;
-    width: 80%; 
-    margin: 20px auto; 
-    text-align: left; 
+    width: 80%; /* or any specific width */
+    margin: 20px auto; /* This centers the block element */
+    height: 200px; /* Adjust the height as needed */
+    overflow-y: auto; /* Add vertical scrollbar when necessary */
+    text-align: left; /* Ensures text inside is left-aligned */
 }
 
 .container {
@@ -61,18 +58,17 @@ p#summary {
     background-color: #fff;
     padding: 40px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center; /* Add this line */
 }
 
 button.copy-btn {
-    margin-top: 10px;
+    margin-top: 10px; /* Spacing above the button */
 }
 
 .spinner-container {
     display: none;
-    position: fixed;
+    position: fixed; /* or 'absolute' if you want it relative to the container */
     top: 0;
     left: 0;
     width: 100%;
@@ -95,8 +91,8 @@ button.copy-btn {
 .buttons-container {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 20px;
+    flex-wrap: wrap; /* Allows buttons to wrap on small screens */
+    margin-top: 20px; /* Adjust as needed */
 }
 
 @keyframes spin {
