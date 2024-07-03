@@ -2,7 +2,7 @@
 
 A Flask application designed to summarize YouTube videos, providing both a concise summary and key highlights with timestamps. This tool leverages the YouTube Transcript API and OpenAI's GPT-3.5 model to generate summaries.
 
-![Up and running](example.png)
+<img src="example.png" width=50% height=50%>
 
 ## Features
 
