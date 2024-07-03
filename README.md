@@ -53,5 +53,5 @@ To modify the application or contribute to its development:
     ``` 
 3. Run the Flask application locally:
     ```sh
-    flash run
+    flask run
     ```
