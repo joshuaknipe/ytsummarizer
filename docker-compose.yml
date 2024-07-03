@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  app:
+    image: python:3.10.13-slim-bookworm
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: flask run --host=0.0.0.0
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+    build:
+      context: .
+      dockerfile: Dockerfile
